@@ -54,5 +54,31 @@ public class DatabaseHandler extends SQLiteOpenHelper {
         dba.close();
     }
 
+    public ArrayList<Food> getAllFood() {
+        foodList.clear();
+        SQLiteDatabase dba = this.getReadableDatabase();
+        Cursor cursor = dba.query(Constants.TABLE_NAME,
+                new String[]{Constants.KEY_ID, Constants.FOOD_NAME, Constants.CALORIES, Constants.DATE_ADDED},
+                null, null, null, null, Constants.DATE_ADDED + " DESC ");
+
+        if (cursor.moveToFirst()) {
+            do {
+                Food food = new Food();
+                food.setFoodName(cursor.getString(cursor.getColumnIndex(Constants.FOOD_NAME)));
+                food.setCalories(cursor.getInt(cursor.getColumnIndex(Constants.CALORIES)));
+                food.setFoodId(cursor.getInt(cursor.getColumnIndex(Constants.KEY_ID)));
+
+                DateFormat dateFormat = DateFormat.getDateInstance();
+                String date = dateFormat.format(new Date(cursor.getLong(cursor.getColumnIndex(Constants.DATE_ADDED))).getTime());
+                food.setRecordDate(date);
+
+                foodList.add(food);
+
+            } while (cursor.moveToNext());
+        }
+        cursor.close();
+        dba.close();
+        return foodList;
+    }
 
 }
